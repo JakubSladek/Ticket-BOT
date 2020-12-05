@@ -1,0 +1,26 @@
+{
+	"compilerOptions": {
+		"module": "ESNext",
+		"moduleResolution": "node",
+		"allowJs": true,
+		"forceConsistentCasingInFileNames": true,
+		"lib": ["ES6", "DOM", "ES2017"],
+		"noImplicitAny": true,
+		"noImplicitReturns": true,
+		"noImplicitThis": true,
+		"noUnusedLocals": true,
+		"strictNullChecks": true,
+		"suppressImplicitAnyIndexErrors": true,
+		"esModuleInterop": true,
+		"allowSyntheticDefaultImports": true,
+		"target": "ESNext",
+		"skipLibCheck": true,
+		"strict": true,
+		"resolveJsonModule": true,
+		"removeComments": true,
+		"preserveConstEnums": true,
+		"outDir": "compiled"
+	},
+	"include": ["src/**/*"],
+	"exclude": ["node_modules"]
+}

@@ -1,0 +1,17 @@
+{
+  "name": "ticket-bot",
+  "version": "1.0.0",
+  "description": "Discord ticket bot",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "type": "module",
+  "author": "Mystiq",
+  "license": "ISC",
+  "dependencies": {
+    "@types/node": "^14.14.10",
+    "discord.js": "^12.5.1",
+    "quick.db": "^7.1.3"
+  }
+}
