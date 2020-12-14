@@ -1,5 +1,6 @@
 import { Message } from "discord.js";
 import Bot from "../../Bot";
+import { command } from "../../types";
 
 module.exports = async (bot: Bot, message: Message) => {
 	if (message.author.bot) return;
@@ -20,7 +21,7 @@ module.exports = async (bot: Bot, message: Message) => {
 
     if (!commands) return;
 
-	const command: Function | undefined = commands.get(cmd);
+	const getCommand: command | undefined = commands.get(cmd);
 
-	if (command) commands.get(cmd)?.bind(null, bot);
+	if (getCommand) bot.runCommand(getCommand, message);
 };

@@ -1,10 +1,10 @@
 require("dotenv").config();
-import { Client, Collection, Snowflake } from "discord.js";
+import { Client, Collection, Message, Snowflake } from "discord.js";
 import db from "quick.db";
-import { ticket } from "./types";
+import { command, ticket } from "./types";
 
 class Bot extends Client {
-	private commands: Collection<string, Function> = new Collection<string, Function>();
+	private commands: Collection<string, command> = new Collection<string, command>();
 
 	constructor(options?: Object) {
 		super(options);
@@ -14,12 +14,16 @@ class Bot extends Client {
 	 *                COMMANDS                  *
 	 *******************************************/
 
-	public setCommand(name: string, commandFunction: Function): void {
+	public setCommand(name: string, commandFunction: command): void {
 		this.commands.set(name, commandFunction);
 	}
 
-	public async getCommands(): Promise<Collection<string, Function>> {
+	public async getCommands(): Promise<Collection<string, command>> {
 		return this.commands;
+	}
+	
+	public async runCommand(command : command, message: Message) : Promise<void> {
+		command.run.bind(null, this, message);
 	}
 
 	/********************************************
@@ -45,8 +49,10 @@ class Bot extends Client {
 			return prefix;
 	}
 
-	public setPrefix(guildID: Snowflake, newPrefix: string): void {
-		db.set(`Guild_${guildID}.settings.global.prefix`, newPrefix);
+	public async setPrefix(guildID: Snowflake, newPrefix: string): Promise<void> {
+		await db.set(`Guild_${guildID}.settings.global.prefix`, newPrefix);
+
+		return;
 	}
 
 	/********************************************
