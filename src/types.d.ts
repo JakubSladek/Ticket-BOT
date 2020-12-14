@@ -1,4 +1,4 @@
-import { Snowflake } from "discord.js";
+import { ColorResolvable, Snowflake } from "discord.js";
 
 /***********
  * Tickets *
@@ -30,6 +30,6 @@ export type command = {
 export type embedArgs = {
 	content: string,
 	title: string?,
-	color: string?,
+	color: ColorResolvable?,
 	footer: string?
 }

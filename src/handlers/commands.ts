@@ -14,7 +14,7 @@ async function bindCommands(bot: Bot) {
 		});
 	});
 
-	console.log(`Loaded ${bot.getCommands().size} commands.`);
+	console.log(`Loaded ${(await bot.getCommands()).size} commands.`);
 }
 
 export default bindCommands;

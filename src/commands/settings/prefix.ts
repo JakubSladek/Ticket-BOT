@@ -8,21 +8,23 @@ module.exports = {
 	description: "Set prefix for actual guild.",
 	category: "settings",
 	permissions: ["owner"],
-	run: async (bot: Bot, message: Message, args: string[]) => {
-		if (!message.guild?.id || args.length != 1 || args[0].length > 10) return;
-        
+	run: async (bot: Bot, message: Message, args: string[]) : Promise<void> => {
+		if (!message.guild?.id || args.length != 1 || args[0].length === 0 || args[0].length > 10) return;
+
 		const prefix = args[0];
+		
+		const embedMsg: embedArgs = {
+			title: "Prefix",
+			content: `Prefix successfully changed to '${prefix}'`,
+			color: 'YELLOW',
+			footer: `Requested by ${message.author.tag} on ${message.guild.name}.`,
+		};
 
-        let errMsg: string;
+		await bot.setPrefix(message.guild?.id, prefix).catch((err) => {
+			embedMsg.content = err;
+			embedMsg.color = 'RED';
+		});
 
-		await bot.setPrefix(message.guild?.id, args[0]).catch((err) => {
-            errMsg = ``;
-        });
-
-        const embedArgs: embedArgs = {
-            content: errMsg
-        }
-
-		message.channel.send(await getEmbed(args));
+		message.channel.send(await getEmbed(embedMsg));
 	},
 };
