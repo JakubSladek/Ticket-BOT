@@ -65,7 +65,7 @@ class Bot extends Client {
 		return result || false;
 	}
 
-	public setTicketCategory(guildID: Snowflake, categoryID: Snowflake): void {
+	public async setTicketCategory(guildID: Snowflake, categoryID: Snowflake): Promise<void> {
 		db.set(`Guilds_${guildID}.settings.tickets.category`, categoryID);
 
 		return;
@@ -77,7 +77,7 @@ class Bot extends Client {
 		return result || false;
 	}
 
-	public setTicketSupportRole(guildID: Snowflake, roleID: Snowflake): void {
+	public async setTicketSupportRole(guildID: Snowflake, roleID: Snowflake): Promise<void> {
 		db.set(`Guilds_${guildID}.settings.tickets.role`, roleID);
 	}
 
@@ -87,7 +87,7 @@ class Bot extends Client {
 		return result || false;
 	}
 
-	public setTicketReactionChannel(guildID: Snowflake, channelID: Snowflake): void {
+	public async setTicketReactionChannel(guildID: Snowflake, channelID: Snowflake): Promise<void> {
 		db.set(`Guild_${guildID}.settings.tickets.channel`, channelID);
 
 		return;
@@ -179,6 +179,11 @@ class Bot extends Client {
 
 		return;
 	}
+
+	/**********************************************************
+	 *                 	   MISC FUNCTIONS                     *
+	 *********************************************************/
+
 }
 
 export default Bot;
