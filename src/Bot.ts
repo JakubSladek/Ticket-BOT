@@ -180,10 +180,21 @@ class Bot extends Client {
 		return;
 	}
 
-	/**********************************************************
-	 *                 	   MISC FUNCTIONS                     *
-	 *********************************************************/
+	/***********************************************
+	 *                    LOGS                     *
+	 ***********************************************/
 
+	public async setDefaultLogChannel(guildID: Snowflake, channelID: Snowflake): Promise<void> {
+		db.set(`Guilds_${guildID}.defaultLogChannel`, channelID);
+
+		return;
+	}
+
+	public async getDefaultLogChannel(guildID: Snowflake): Promise<Snowflake | boolean> {
+		let logChannel = await db.get(`Guilds_${guildID}.defaultLogChannel`);
+
+		return logChannel || false;
+	}
 }
 
 export default Bot;
