@@ -93,6 +93,64 @@ class Bot extends Client {
 		return;
 	}
 
+	/*****************************************
+	 *            DB TICKETS MISC            *
+	 *****************************************/
+
+	private async updateTicketInDB(guildID: Snowflake, ticketToUpdate: ticket): Promise<boolean> {
+		if (!(await this.ticketExistsInDB(guildID, ticketToUpdate))) return false;
+
+		const tickets: ticket[] = await this.getTickets(guildID);
+
+		for (let i = 0; i < tickets.length - 1; i++) {
+			if (tickets[i].id == ticketToUpdate.id) {
+				tickets[i] = ticketToUpdate;
+
+				break;
+			}
+		}
+
+		return true;
+	}
+
+	private async removeTicketFromDB(guildID: Snowflake, ticketToRemove: ticket): Promise<boolean> {
+		if (!(await this.ticketExistsInDB(guildID, ticketToRemove))) return false;
+
+		const tickets: ticket[] = await this.getTickets(guildID);
+
+		let ticketIndex: number | undefined = tickets.indexOf(ticketToRemove);
+
+		if (!ticketIndex) return false;
+
+		if (ticketIndex > -1) tickets.splice(ticketIndex, 1);
+
+		await this.setTickets(guildID, tickets);
+
+		return true;
+	}
+
+	private async ticketExistsInDB(guildID: Snowflake, ticketToFind: ticket): Promise<boolean> {
+		const tickets: ticket[] | undefined = await this.getTickets(guildID);
+
+		if (!tickets.length) return false;
+
+		let ticketInDB: ticket | undefined = tickets.find((myTicket) => myTicket == ticketToFind);
+
+		return ticketInDB ? true : false;
+	}
+
+	private async getTicketFromDB(guildID: Snowflake, ticketToGet: ticket): Promise<ticket | false> {
+		const tickets: ticket[] | undefined = await this.getTickets(guildID);
+
+		if (!tickets.length) return false;
+
+		let findTicket: ticket | undefined = tickets.find((myTicket) => myTicket == ticketToGet);
+
+		if (!findTicket) return false;
+
+		return findTicket;
+	}
+
 	/*******************************************************
 	 *            	TICKETS GETTERS / SETTERS              *
 	 ******************************************************/
@@ -101,8 +159,8 @@ class Bot extends Client {
 		return await db.get(`Guilds_${guildID}.tickets`);
 	}
 
-	public async setTickets(guildID: Snowflake, tickets: any): Promise<void> {
-		db.set(`Guilds_${guildID}.tickets`, tickets);
+	public async setTickets(guildID: Snowflake, tickets: ticket[]): Promise<void> {
+		await db.set(`Guilds_${guildID}.tickets`, tickets);
 
 		return;
 	}
@@ -111,47 +169,48 @@ class Bot extends Client {
 	 *                TICKETS GLOBAL                *
 	 ************************************************/
 
-	public createTicket(guildID: Snowflake, newTicket: ticket): void {
+	public async createTicket(guildID: Snowflake, newTicket: ticket): Promise<void> {
 		db.push(`Guild_${guildID}.tickets`, newTicket);
+
+		// create ticket channel and send message
+
+		return;
+	}
+
+	public async reopenTicket(guildID: Snowflake, closedTicket: ticket): Promise<boolean> {
+		const ticketInDB: ticket | false = await this.getTicketFromDB(guildID, closedTicket);
+
+		if (!ticketInDB) return false;
+
+		// Change ticket channel status to opened
+
+		ticketInDB.resolved = false;
+
+		this.updateTicketInDB(guildID, ticketInDB);
+
+		return true;
 	}
 
 	public async resolveTicket(guildID: Snowflake, ticketToResolve: ticket): Promise<boolean> {
-		let tickets: any = await this.getTickets(guildID);
+		const ticketinDB: ticket | false = await this.getTicketFromDB(guildID, ticketToResolve);
 
-		if (!tickets.length) return false;
+		if (!ticketinDB) return false;
 
-		let found: boolean = false;
+		// change ticket channel status to resolved
 
-		for (let i: number = 0; i < tickets.length - 1; i++) {
-			if (tickets[i] === ticketToResolve) {
-				found = true;
-				ticketToResolve.resolved = true;
-				this.setTickets(guildID, tickets);
+		ticketToResolve.resolved = true;
 
-				break;
-			}
-		}
+		this.updateTicketInDB(guildID, ticketToResolve);
 
-		return found;
+		return true;
 	}
 
 	public async deleteTicket(guildID: Snowflake, ticketToDelete: ticket): Promise<boolean> {
-		let tickets: any = await this.getTickets(guildID);
+		if (!(await this.removeTicketFromDB(guildID, ticketToDelete))) return false;
 
-		if (!tickets.length) return false;
+		// remove ticket's channel
 
-		let found: boolean = false;
-
-		for (let i: number = 0; i < tickets.length - 1; i++) {
-			if (tickets[i] === ticketToDelete) {
-				found = true;
-				delete tickets[i];
-
-				this.setTickets(guildID, tickets);
-			}
-		}
-
-		return found;
+		return true;
 	}
 
 	/**********************************************************
@@ -165,7 +224,7 @@ class Bot extends Client {
 	}
 
 	public async setTotalCreatedTickets(guildID: Snowflake, ticketsTotal: number): Promise<void> {
-		db.set(`Guilds_${guildID}.createdTickets`, ticketsTotal);
+		await db.set(`Guilds_${guildID}.createdTickets`, ticketsTotal);
 
 		return;
 	}
@@ -175,25 +234,55 @@ class Bot extends Client {
 
 		totalTickets++;
 
-		this.setTotalCreatedTickets(guildID, totalTickets);
+		await this.setTotalCreatedTickets(guildID, totalTickets);
 
 		return;
 	}
+
+	/**********************************************
+	 *             TICKET CHANNELS                *
+	 **********************************************/
+
+	/*
+	private async createTicketChannel(guildID: Snowflake, userID: Snowflake): Promise<void> {
+		return;
+	}
+
+	private async addUserToTicket(guildID: Snowflake, selectedTicket: ticket, userID: Snowflake): Promise<void> {
+		return;
+	}
+
+	private async removeUserFromTicket(guildID: Snowflake, selectedTicket: ticket, userID: Snowflake): Promise<void> {
+		return;
+	}
+
+	private async closeTicket(guildID: Snowflake, selectedTicket: ticket): Promise<void> {
+		return;
+	}
+	*/
+
+	/*********************************************
+	 *              TICKETS MISC                 *
+	 *********************************************/
+
+	transcriptTicket() {}
 
 	/***********************************************
 	 *                    LOGS                     *
 	 ***********************************************/
 
 	public async setDefaultLogChannel(guildID: Snowflake, channelID: Snowflake): Promise<void> {
-		db.set(`Guilds_${guildID}.defaultLogChannel`, channelID);
+		await db.set(`Guilds_${guildID}.defaultLogChannel`, channelID);
 
 		return;
 	}
 
 	public async getDefaultLogChannel(guildID: Snowflake): Promise<Snowflake | boolean> {
-		let logChannel = await db.get(`Guilds_${guildID}.defaultLogChannel`);
+		let logChannel: Snowflake | undefined = await db.get(`Guilds_${guildID}.defaultLogChannel`);
 
-		return logChannel || false;
+		if (!logChannel) return false;
+
+		return logChannel;
 	}
 }
 
