@@ -118,7 +118,7 @@ class Bot extends Client {
 
 		const tickets: ticket[] = await this.getTickets(guildID);
 
-		let ticketIndex: number | undefined = tickets.indexOf(ticketToRemove);
+		let ticketIndex: number = tickets.indexOf(ticketToRemove);
 
 		if (!ticketIndex) return false;
 
