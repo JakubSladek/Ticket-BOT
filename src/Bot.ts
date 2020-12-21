@@ -130,13 +130,7 @@ class Bot extends Client {
 	}
 
 	private async ticketExistsInDB(guildID: Snowflake, ticketToFind: ticket): Promise<boolean> {
-		const tickets: ticket[] | undefined = await this.getTickets(guildID);
-
-		if (!tickets.length) return false;
-
-		let ticketInDB: ticket | undefined = tickets.find((myTicket) => myTicket == ticketToFind);
-
-		return ticketInDB ? true : false;
+		return (await this.getTicketFromDB(guildID, ticketToFind)) ? true : false;
 	}
 
 	private async getTicketFromDB(guildID: Snowflake, ticketToGet: ticket): Promise<ticket | false> {
