@@ -78,7 +78,9 @@ class Bot extends Client {
 	}
 
 	public async setTicketSupportRole(guildID: Snowflake, roleID: Snowflake): Promise<void> {
-		db.set(`Guilds_${guildID}.settings.tickets.role`, roleID);
+		await db.set(`Guilds_${guildID}.settings.tickets.role`, roleID);
+
+		return;
 	}
 
 	public async getTicketReactionChannel(guildID: Snowflake): Promise<string | boolean> {
@@ -119,9 +121,7 @@ class Bot extends Client {
 		const tickets: ticket[] = await this.getTickets(guildID);
 
 		let ticketIndex: number = tickets.indexOf(ticketToRemove);
-
-		if (!ticketIndex) return false;
-
+		
 		if (ticketIndex > -1) tickets.splice(ticketIndex, 1);
 
 		await this.setTickets(guildID, tickets);
@@ -259,7 +259,7 @@ class Bot extends Client {
 	 *              TICKETS MISC                 *
 	 *********************************************/
 
-	transcriptTicket() {}
+	public async transcriptTicket() {}
 
 	/***********************************************
 	 *                    LOGS                     *
